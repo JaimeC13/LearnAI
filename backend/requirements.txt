@@ -4,5 +4,5 @@ pydantic==2.8.2
 pydantic-settings==2.4.0
 python-multipart==0.0.9
 pypdf==4.3.1
-tokenizers==0.19.1
+tokenizers>=0.20.0
 torch==2.3.1 --extra-index-url https://download.pytorch.org/whl/cpu
