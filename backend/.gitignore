@@ -4,12 +4,8 @@ __pycache__/
 venv/
 .env
 
-checkpoints/
 *.pt
-*.bin
-*.onnx
-*.safetensors
-tokenizer_*.json
+
 
 *.log
 
