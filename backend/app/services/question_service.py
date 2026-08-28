@@ -1,3 +1,4 @@
+# backend/app/services/question_service.py
 import os
 import urllib.request
 import torch
@@ -16,8 +17,7 @@ class QuestionService:
     def _initialize_engine(self):
         os.makedirs(os.path.dirname(settings.MODEL_PATH), exist_ok=True)
 
-        if not os.path.exists(settings.TOKENIZER_PATH):
-            urllib.request.urlretrieve(TOKENIZER_DOWNLOAD_URL, settings.TOKENIZER_PATH)
+        urllib.request.urlretrieve(TOKENIZER_DOWNLOAD_URL, settings.TOKENIZER_PATH)
 
         self.tokenizer = Tokenizer.from_file(settings.TOKENIZER_PATH)
         self.vocab_size = self.tokenizer.get_vocab_size()
@@ -25,7 +25,7 @@ class QuestionService:
         self.BOS_ID = self.tokenizer.token_to_id("<BOS>")
         self.EOS_ID = self.tokenizer.token_to_id("<EOS>")
 
-        if not os.path.exists(settings.MODEL_PATH):
+        if not os.path.exists(settings.MODEL_PATH) or os.path.getsize(settings.MODEL_PATH) < 10000000:
             urllib.request.urlretrieve(MODEL_DOWNLOAD_URL, settings.MODEL_PATH)
 
         self.model = EncoderDecoderModel(self.vocab_size, self.PAD_ID).to(settings.DEVICE)
