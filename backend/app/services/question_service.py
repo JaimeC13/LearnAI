@@ -7,6 +7,9 @@ from tokenizers import Tokenizer
 from app.core.config import settings
 from app.ml.transformer import EncoderDecoderModel
 
+torch.set_num_threads(1)
+
+
 MODEL_DOWNLOAD_URL = "https://github.com/JaimeC13/LearnAI/releases/download/v1.0.0/modelo_llm_definitivo.pt"
 TOKENIZER_DOWNLOAD_URL = "https://github.com/JaimeC13/LearnAI/releases/download/v1.0.0/tokenizer_bpe_v2_24k.json"
 
@@ -28,9 +31,15 @@ class QuestionService:
         if not os.path.exists(settings.MODEL_PATH) or os.path.getsize(settings.MODEL_PATH) < 10000000:
             urllib.request.urlretrieve(MODEL_DOWNLOAD_URL, settings.MODEL_PATH)
 
-        self.model = EncoderDecoderModel(self.vocab_size, self.PAD_ID).to(settings.DEVICE)
-        self.model.load_state_dict(torch.load(settings.MODEL_PATH, map_location=settings.DEVICE))
+        state_dict = torch.load(settings.MODEL_PATH, map_location="cpu", mmap=True)
+        self.model.load_state_dict(state_dict)
         self.model.eval()
+        
+        del state_dict
+        gc.collect()
+
+
+        
 
     def generate_question(self, text: str, beam_width: int = 5) -> str:
         self.model.eval()
