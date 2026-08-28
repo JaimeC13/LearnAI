@@ -1,4 +1,5 @@
 import os
+import urllib.request
 import torch
 from torch.nn import functional as F
 from tokenizers import Tokenizer
@@ -6,22 +7,26 @@ from app.core.config import settings
 from app.ml.transformer import EncoderDecoderModel
 
 MODEL_DOWNLOAD_URL = "https://github.com/JaimeC13/LearnAI/releases/download/v1.0.0/modelo_llm_definitivo.pt"
+TOKENIZER_DOWNLOAD_URL = "https://github.com/JaimeC13/LearnAI/releases/download/v1.0.0/tokenizer_bpe_v2_24k.json"
 
 class QuestionService:
     def __init__(self):
         self._initialize_engine()
 
     def _initialize_engine(self):
+        os.makedirs(os.path.dirname(settings.MODEL_PATH), exist_ok=True)
+
+        if not os.path.exists(settings.TOKENIZER_PATH):
+            urllib.request.urlretrieve(TOKENIZER_DOWNLOAD_URL, settings.TOKENIZER_PATH)
+
         self.tokenizer = Tokenizer.from_file(settings.TOKENIZER_PATH)
         self.vocab_size = self.tokenizer.get_vocab_size()
         self.PAD_ID = self.tokenizer.token_to_id("<PAD>")
         self.BOS_ID = self.tokenizer.token_to_id("<BOS>")
         self.EOS_ID = self.tokenizer.token_to_id("<EOS>")
 
-        os.makedirs(os.path.dirname(settings.MODEL_PATH), exist_ok=True)
         if not os.path.exists(settings.MODEL_PATH):
             urllib.request.urlretrieve(MODEL_DOWNLOAD_URL, settings.MODEL_PATH)
-            
 
         self.model = EncoderDecoderModel(self.vocab_size, self.PAD_ID).to(settings.DEVICE)
         self.model.load_state_dict(torch.load(settings.MODEL_PATH, map_location=settings.DEVICE))
