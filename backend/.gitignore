@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+checkpoints/
+*.pt
+*.bin
+*.onnx
+*.safetensors
+tokenizer_*.json
+
+*.log
+
+.env*.local
+.env
